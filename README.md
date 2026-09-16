@@ -8,7 +8,7 @@
 - График: Пн–Сб 10:00–19:00
 - Телефон / WhatsApp: +995 597 01 03 17
 - Адрес: Hualing, Viktor Kupradze 74/10, Tbilisi
-- Цены: публичный калькулятор Bucho Denti, USD
+- Цены: публичный калькулятор Bucho Denti, GEL / Georgian lari (₾)
 
 ## Чтобы включить живую запись
 1. Создать отдельный Google Calendar для Bucho Denti.
