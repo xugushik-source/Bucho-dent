@@ -1,0 +1,40 @@
+name: Import Bucho Denti demo
+
+on:
+  push:
+    paths:
+      - '.github/workflows/import-demo.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Bucho-dent
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get current Bucho Denti demo from master repository
+        run: |
+          git clone --depth 1 https://github.com/xugushik-source/galadent-plus.git /tmp/galadent-plus
+          cp /tmp/galadent-plus/buchodenti-demo/index.html ./index.html
+          cp /tmp/galadent-plus/buchodenti-demo/about.html ./about.html
+          cp /tmp/galadent-plus/buchodenti-demo/tips.html ./tips.html
+          cp /tmp/galadent-plus/buchodenti-demo/staff.html ./staff.html
+          cp /tmp/galadent-plus/buchodenti-demo/Code.gs ./Code.gs
+
+      - name: Commit imported project
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html about.html tips.html staff.html Code.gs
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Import Bucho Denti demo from GALADENT master"
+            git push
+          fi
