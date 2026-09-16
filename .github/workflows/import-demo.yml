@@ -1,4 +1,4 @@
-name: Import Bucho Denti demo
+name: Build Bucho Denti from GALADENT master
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  import:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Bucho-dent
@@ -18,24 +18,110 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get current Bucho Denti demo from master repository
+      - name: Copy exact GALADENT master files
         run: |
+          rm -rf /tmp/galadent-plus
           git clone --depth 1 https://github.com/xugushik-source/galadent-plus.git /tmp/galadent-plus
-          cp /tmp/galadent-plus/buchodenti-demo/index.html ./index.html
-          cp /tmp/galadent-plus/buchodenti-demo/about.html ./about.html
-          cp /tmp/galadent-plus/buchodenti-demo/tips.html ./tips.html
-          cp /tmp/galadent-plus/buchodenti-demo/staff.html ./staff.html
-          cp /tmp/galadent-plus/buchodenti-demo/Code.gs ./Code.gs
+          cp /tmp/galadent-plus/index.html ./index.html
+          cp /tmp/galadent-plus/about.html ./about.html
+          cp /tmp/galadent-plus/tips.html ./tips.html
+          cp /tmp/galadent-plus/staff.html ./staff.html
+          cp /tmp/galadent-plus/Code.gs ./Code.gs
 
-      - name: Commit imported project
+      - name: Adapt only Bucho Denti variables and content
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          files = ['index.html','about.html','tips.html','staff.html','Code.gs']
+          for fn in files:
+              p = Path(fn)
+              s = p.read_text(encoding='utf-8')
+              s = s.replace('GALADENT+', 'BUCHO DENTI')
+              s = s.replace('galadentLang', 'buchoDentiLang')
+              s = s.replace('+995514593000', '+995597010317')
+              s = s.replace('+995 514 59 30 00', '+995 597 01 03 17')
+              s = s.replace('Тбилиси, Глдани', 'Тбилиси, Hualing')
+              s = s.replace('Gldani, Tbilisi', 'Hualing, Tbilisi')
+              s = s.replace('Dentistry in Gldani, Tbilisi', 'Dentistry in Tbilisi')
+              s = s.replace('Стоматология в Глдани, Тбилиси', 'Стоматология в Тбилиси')
+              s = s.replace('სტომატოლოგია გლდანში, თბილისში', 'სტომატოლოგია თბილისში')
+              s = s.replace('V მიკრორაიონი, კორპ. 26ბ, გლდანი, თბილისი', 'ჰუალინგი, ვიქტორ კუპრაძის 74/10, თბილისი')
+              s = s.replace('V microdistrict, building 26B, Gldani, Tbilisi', '74/10 Hualing, Viktor Kupradze, Tbilisi')
+              s = s.replace('V микрорайон, корпус 26Б, Глдани, Тбилиси', 'Hualing, Viktor Kupradze 74/10, Тбилиси')
+              s = s.replace('ორშაბათი–შაბათი, 9:00–19:00', 'ორშაბათი–შაბათი, 10:00–19:00')
+              s = s.replace('Mon–Sat, 9:00–19:00', 'Mon–Sat, 10:00–19:00')
+              s = s.replace('пн–сб, 9:00–19:00', 'пн–сб, 10:00–19:00')
+              p.write_text(s, encoding='utf-8')
+
+          # Main page: keep GALADENT design exactly, replace logo, route, Bucho prices and API placeholder.
+          p = Path('index.html'); s = p.read_text(encoding='utf-8')
+          s = re.sub(r'<img src="data:image/png;base64,[^"]+"', '<img src="https://buchodenti.com/uploads/6920f5e3ef980.png"', s, count=1)
+          s = re.sub(r'https://www\.google\.com/maps/dir/\?api=1[^\"]+', 'https://www.google.com/maps/search/?api=1&query=Hualing%2C+Viktor+Kupradze+74%2F10%2C+Tbilisi', s, count=1)
+          s = re.sub(r"const WEB_APP_URL = '[^']*';", "const WEB_APP_URL = 'ВСТАВЬ_СЮДА_BUCHO_DENTI_WEB_APP_URL';", s, count=1)
+          services = r'''const SERVICES = [
+            { id:'b1', cat:{ka:'იმპლანტაცია',ru:'Имплантация',en:'Implants'}, name:{ka:'ტიტანის იმპლანტი სრული კომპლექტი (SGS + აბატმენტი + გვირგვინი)',ru:'Титановый имплант, полный комплект (SGS + абатмент + коронка)',en:'Titanium Implant Full Set (SGS + Abutment + Crown)'}, price:650, approx:false },
+            { id:'b2', cat:{ka:'იმპლანტაცია',ru:'Имплантация',en:'Implants'}, name:{ka:'ცირკონიუმის იმპლანტი აბატმენტით',ru:'Циркониевый имплант с абатментом',en:'Zirconium Implant (incl. Abutment)'}, price:680, approx:false },
+            { id:'b3', cat:{ka:'იმპლანტაცია',ru:'Имплантация',en:'Implants'}, name:{ka:'ტიტანის იმპლანტი',ru:'Титановый имплант',en:'Titanium Implant (Implant Only)'}, price:400, approx:false },
+            { id:'b4', cat:{ka:'იმპლანტაცია',ru:'Имплантация',en:'Implants'}, name:{ka:'აბატმენტი',ru:'Абатмент',en:'Abutment (Per Unit)'}, price:30, approx:false },
+            { id:'b5', cat:{ka:'პროთეზირება',ru:'Протезирование',en:'Prosthetics'}, name:{ka:'გვირგვინი იმპლანტზე',ru:'Коронка на имплант',en:'Crown on Implant'}, price:250, approx:false },
+            { id:'b6', cat:{ka:'იმპლანტაცია',ru:'Имплантация',en:'Implants'}, name:{ka:'All-on-4 პაკეტი, 1 ყბა',ru:'All-on-4, пакет на 1 челюсть',en:'All-on-4 Implants Package (1 Jaw)'}, price:3300, approx:false },
+            { id:'b7', cat:{ka:'თერაპია',ru:'Терапия',en:'Therapy'}, name:{ka:'კომპოზიტური ბჟენი',ru:'Композитная пломба',en:'Composite Filling'}, price:70, approx:false },
+            { id:'b8', cat:{ka:'ქირურგია',ru:'Хирургия',en:'Surgery'}, name:{ka:'კბილის მარტივი ამოღება',ru:'Простое удаление зуба',en:'Simple Tooth Extraction'}, price:50, approx:false },
+            { id:'b9', cat:{ka:'ქირურგია',ru:'Хирургия',en:'Surgery'}, name:{ka:'სიბრძნის კბილის / ქირურგიული ამოღება',ru:'Удаление зуба мудрости / хирургическое удаление',en:'Wisdom Tooth / Surgical Extraction'}, price:100, approx:false },
+            { id:'b10', cat:{ka:'ქირურგია',ru:'Хирургия',en:'Surgery'}, name:{ka:'ძვლის პლასტიკა',ru:'Костная пластика',en:'Bone Graft (Per Unit)'}, price:400, approx:false },
+            { id:'b11', cat:{ka:'ქირურგია',ru:'Хирургия',en:'Surgery'}, name:{ka:'სინუს-ლიფტინგი',ru:'Синус-лифтинг',en:'Sinus Lifting Procedure'}, price:800, approx:false },
+            { id:'b12', cat:{ka:'ჰიგიენა',ru:'Гигиена',en:'Hygiene'}, name:{ka:'პროფესიული წმენდა და სკეილინგი',ru:'Профессиональная чистка и скейлинг',en:'Professional Teeth Cleaning & Scaling'}, price:150, approx:false },
+            { id:'b13', cat:{ka:'ესთეტიკა',ru:'Эстетика',en:'Aesthetic'}, name:{ka:'კბილების პროფესიული გათეთრება',ru:'Профессиональное отбеливание зубов',en:'In-Office Teeth Whitening'}, price:350, approx:false },
+            { id:'b14', cat:{ka:'ორთოდონტია',ru:'Ортодонтия',en:'Orthodontics'}, name:{ka:'ლითონის ბრეკეტები, 1 ყბა',ru:'Металлические брекеты, 1 челюсть',en:'Fixed Metal Braces (Per Jaw)'}, price:700, approx:false },
+            { id:'b15', cat:{ka:'ორთოდონტია',ru:'Ортодонтия',en:'Orthodontics'}, name:{ka:'გამჭვირვალე ბრეკეტები, 1 ყბა',ru:'Прозрачные брекеты, 1 челюсть',en:'Fixed Clear Braces (Per Jaw)'}, price:800, approx:false }
+          ];'''
+          s = re.sub(r'const SERVICES = \[.*?\n  \];', services, s, count=1, flags=re.S)
+          s = s.replace(" + ' ₾'", " + ' $'").replace(" + ' \\u20BE'", " + ' $'").replace(" + total + ' \\u20BE'", " + total + ' $'")
+          s = s.replace("sum + ' ₾'", "sum + ' $'").replace("discountAmount + ' ₾", "discountAmount + ' $").replace("total + ' ₾'", "total + ' $'")
+          s = s.replace('ფასები საორიენტაციოა, საბოლოო ფასი განისაზღვრება ექიმის გასინჯვის შემდეგ.', 'ფასები აღებულია Bucho Denti-ს საჯარო კალკულატორიდან; საბოლოო გეგმა და ღირებულება დასტურდება ექიმის კონსულტაციის შემდეგ.')
+          s = s.replace('Цены ориентировочные, окончательная стоимость — после осмотра.', 'Цены взяты из открытого калькулятора Bucho Denti; окончательный план и стоимость подтверждаются после консультации врача.')
+          s = s.replace("Prices are approximate; the final cost is confirmed after the doctor's examination.", "Prices are taken from Bucho Denti's public calculator; the final treatment plan and cost are confirmed after consultation.")
+          p.write_text(s, encoding='utf-8')
+
+          # About page: same GALADENT layout, Bucho photos and verified clinic information.
+          p = Path('about.html'); s = p.read_text(encoding='utf-8')
+          s = s.replace('consultation.jpeg', 'https://www.buchodenti.com/uploads/6a9440c2b2aa9.jpeg')
+          s = s.replace('xray-review.jpeg', 'https://www.buchodenti.com/uploads/estetikuri.webp')
+          s = s.replace('reception.jpeg', 'https://www.buchodenti.com/uploads/69244c89a5aff.jpg')
+          s = s.replace('4.6★', '100%')
+          s = s.replace('შეფასება Google-ზე', 'შვეიცარიული & გერმანული ხარისხი').replace('Рейтинг на Google', 'швейцарские & немецкие материалы').replace('Google rating', 'Swiss & German materials')
+          s = s.replace('ჩვენი გუნდი</strong> — გამოცდილი სტომატოლოგები თერაპიის, ორთოდონტიისა და ბავშვთა სტომატოლოგიის მიმართულებით. დეტალური ინფორმაცია ექიმების შესახებ მალე დაემატება.', 'ჩვენი გუნდი</strong> — იზა ძიძიკაშვილი, თეა ძიძიკაშვილი და ვასიფ ალიევი; ადმინისტრატორი ნინო თედიაშვილი. კლინიკა მუშაობს იმპლანტოლოგიის, ქირურგიის, პროთეზირების, თერაპიისა და ესთეტიკური სტომატოლოგიის მიმართულებით.')
+          s = s.replace('Our team</strong> — experienced dentists covering therapy, orthodontics and pediatric dentistry. Detailed doctor profiles will be added soon.', 'Our team</strong> includes Dr. Iza Dzidzikashvili, Dr. Tea Dzidzikashvili and Dr. Vasif Aliyev, with Nino Tediashvili as administrator. The clinic works across implantology, surgery, prosthodontics, therapy and aesthetic dentistry.')
+          s = s.replace('Наша команда</strong> — опытные стоматологи по направлениям терапии, ортодонтии и детской стоматологии. Подробная информация о врачах появится позже.', 'Наша команда</strong> — Иза Дзидзикашвили, Теа Дзидзикашвили и Васиф Алиев; администратор Нино Тедиашвили. Клиника работает по направлениям имплантологии, хирургии, протезирования, терапии и эстетической стоматологии.')
+          s = s.replace('განვადება', 'საერთაშორისო პაციენტები').replace('Рассрочка', 'Международные пациенты').replace('Installment plan', 'International patients')
+          p.write_text(s, encoding='utf-8')
+
+          # Staff: exact GALADENT staff UI, Bucho logo and independent backend placeholder.
+          p = Path('staff.html'); s = p.read_text(encoding='utf-8')
+          s = re.sub(r'<img src="data:image/png;base64,[^"]+"', '<img src="https://buchodenti.com/uploads/6920f5e3ef980.png"', s, count=1)
+          s = re.sub(r"const WEB_APP_URL = '[^']*';", "const WEB_APP_URL = 'ВСТАВЬ_СЮДА_BUCHO_DENTI_WEB_APP_URL';", s, count=1)
+          p.write_text(s, encoding='utf-8')
+
+          # Backend: dedicated Bucho sheet, dedicated calendar placeholder, Bucho working hours.
+          p = Path('Code.gs'); s = p.read_text(encoding='utf-8')
+          s = re.sub(r"const SHEET_ID = '[^']*';", "const SHEET_ID = '1z-CW1n3Csn4wMqdt7-G9cnoMKyhyug8lO4w5Ce4QvZA';", s, count=1)
+          s = re.sub(r"const CALENDAR_ID = '[^']*';", "const CALENDAR_ID = 'ВСТАВЬ_СЮДА_BUCHO_DENTI_CALENDAR_ID';", s, count=1)
+          s = s.replace('const WORK_START_HOUR = 9;', 'const WORK_START_HOUR = 10;')
+          s = s.replace('// 9:00', '// 10:00')
+          p.write_text(s, encoding='utf-8')
+
+          Path('README.md').write_text('''# Bucho Denti\n\nПроект собран один в один на мастер-шаблоне GALADENT+.\n\n## Уже настроено\n- Google Sheet: 1z-CW1n3Csn4wMqdt7-G9cnoMKyhyug8lO4w5Ce4QvZA\n- Лист: Bookings\n- График: Пн–Сб 10:00–19:00\n- Телефон / WhatsApp: +995 597 01 03 17\n- Адрес: Hualing, Viktor Kupradze 74/10, Tbilisi\n- Цены: публичный калькулятор Bucho Denti, USD\n\n## Чтобы включить живую запись\n1. Создать отдельный Google Calendar для Bucho Denti.\n2. Вставить его Calendar ID в Code.gs.\n3. Создать Apps Script, вставить Code.gs и Deploy → Web app.\n4. Вставить полученный /exec URL в index.html и staff.html вместо ВСТАВЬ_СЮДА_BUCHO_DENTI_WEB_APP_URL.\n5. После этого сайт, STAFF, Google Sheet и Calendar работают как единая система.\n''', encoding='utf-8')
+
+      - name: Commit adapted project
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html about.html tips.html staff.html Code.gs
+          git add index.html about.html tips.html staff.html Code.gs README.md
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Import Bucho Denti demo from GALADENT master"
+            git commit -m "Rebuild Bucho Denti from GALADENT master"
             git push
           fi
-# trigger import
