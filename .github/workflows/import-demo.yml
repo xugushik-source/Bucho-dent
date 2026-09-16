@@ -1,4 +1,4 @@
-name: Finalize Bucho Denti
+name: Normalize Bucho Denti
 on:
   push:
     paths: ['.github/workflows/import-demo.yml']
@@ -6,30 +6,25 @@ on:
 permissions:
   contents: write
 jobs:
-  finalize:
+  normalize:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Fix Bucho variables
+      - name: Normalize labels
         shell: python
         run: |
           from pathlib import Path
-          import re
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
-          s=s.replace('995514593000','995597010317')
-          s=s.replace("s.price + ' ₾'", "s.price + ' $'")
-          s=s.replace("sum + ' ₾'", "sum + ' $'")
-          s=s.replace("discountAmount + ' ₾", "discountAmount + ' $")
-          s=s.replace("total + ' ₾'", "total + ' $'")
-          s=s.replace("s.price + ' \\u20BE'", "s.price + ' $'")
-          s=s.replace("total + ' \\u20BE'", "total + ' $'")
-          s=re.sub(r"function calcDiscountRate\(count\) \{.*?\n  \}", "function calcDiscountRate(count) {\n    return 0;\n  }", s, count=1, flags=re.S)
+          s=s.replace(' ₾',' $').replace('\\u20BE','$')
+          s=s.replace('კალკულატორი ავტომატურად დაითვლის ფასდაკლებას','კალკულატორი ავტომატურად დაითვლის არჩეული მომსახურებების ჯამს')
+          s=s.replace('калькулятор ниже посчитает скидку','калькулятор ниже посчитает общую стоимость')
+          s=s.replace('the calculator below will work out the discount automatically','the calculator below will calculate the total')
           p.write_text(s,encoding='utf-8')
-      - name: Commit fixes
+      - name: Commit
         run: |
           git config user.name github-actions
           git config user.email actions@github.com
           git add index.html
-          git diff --cached --quiet || git commit -m 'Finalize Bucho Denti variables'
+          git diff --cached --quiet || git commit -m 'Normalize Bucho Denti USD labels'
           git push
