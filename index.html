@@ -205,9 +205,9 @@
 
   <section id="prices">
     <div class="section-head">
-      <div data-i18n="ka"><div class="kicker">ფასების სია</div><h2>პოპულარული სერვისები</h2><p>მონიშნეთ სასურველი სერვისები — ქვემოთ მოცემული კალკულატორი ავტომატურად დაითვლის ფასდაკლებას.</p></div>
-      <div data-i18n="ru"><div class="kicker">Прайс-лист</div><h2>Популярные услуги</h2><p>Отметьте нужные — калькулятор ниже посчитает скидку.</p></div>
-      <div data-i18n="en"><div class="kicker">Price list</div><h2>Popular services</h2><p>Select the services you need — the calculator below will work out the discount automatically.</p></div>
+      <div data-i18n="ka"><div class="kicker">ფასების სია</div><h2>პოპულარული სერვისები</h2><p>მონიშნეთ სასურველი სერვისები — ქვემოთ მოცემული კალკულატორი ავტომატურად დაითვლის არჩეული მომსახურებების ჯამს.</p></div>
+      <div data-i18n="ru"><div class="kicker">Прайс-лист</div><h2>Популярные услуги</h2><p>Отметьте нужные — калькулятор ниже посчитает общую стоимость.</p></div>
+      <div data-i18n="en"><div class="kicker">Price list</div><h2>Popular services</h2><p>Select the services you need — the calculator below will calculate the total.</p></div>
     </div>
     <div class="price-list" id="priceList"></div>
     <div class="price-disclaimer">
@@ -225,9 +225,9 @@
     </div>
     <div class="calc-card">
       <div class="calc-row"><span class="muted"><span data-i18n="ka">არჩეული სერვისები</span><span data-i18n="ru">Выбрано услуг</span><span data-i18n="en">Selected services</span></span><span id="calcCount">0</span></div>
-      <div class="calc-row"><span class="muted"><span data-i18n="ka">სრული თანხა ფასდაკლების გარეშე</span><span data-i18n="ru">Сумма без скидки</span><span data-i18n="en">Amount before discount</span></span><span id="calcSum">0 ₾</span></div>
+      <div class="calc-row"><span class="muted"><span data-i18n="ka">სრული თანხა ფასდაკლების გარეშე</span><span data-i18n="ru">Сумма без скидки</span><span data-i18n="en">Amount before discount</span></span><span id="calcSum">0 $</span></div>
       <div class="calc-row"><span class="muted"><span data-i18n="ka">ფასდაკლება</span><span data-i18n="ru">Скидка</span><span data-i18n="en">Discount</span></span><span id="calcDiscount">—</span></div>
-      <div class="calc-row total"><span><span data-i18n="ka">სულ</span><span data-i18n="ru">Итого</span><span data-i18n="en">Total</span></span><span id="calcTotal">0 ₾</span></div>
+      <div class="calc-row total"><span><span data-i18n="ka">სულ</span><span data-i18n="ru">Итого</span><span data-i18n="en">Total</span></span><span id="calcTotal">0 $</span></div>
       <div class="calc-tiers">
         <span data-i18n="ka">2–3 სერვისი — 5% ფასდაკლება · 4–5 სერვისი — 10% · 6 ან მეტი — 15%</span>
         <span data-i18n="ru">2–3 услуги — скидка 5% · 4–5 услуг — скидка 10% · 6 и более — скидка 15%</span>
@@ -365,7 +365,7 @@
           '<div class="price-row">' +
             '<input type="checkbox" class="svc-check" data-id="' + s.id + '">' +
             '<div class="price-name">' + s.name[currentLang] + '</div>' +
-            '<div class="price-amount">' + (s.approx ? (currentLang==='ka'?'დან ':currentLang==='en'?'from ':'от ') : '') + s.price + ' ₾</div>' +
+            '<div class="price-amount">' + (s.approx ? (currentLang==='ka'?'დან ':currentLang==='en'?'from ':'от ') : '') + s.price + ' $</div>' +
           '</div>'
         ).join('');
     }).join('');
@@ -401,7 +401,7 @@
     const total = sum - Math.round(sum * rate);
     return {
       total: total,
-      text: chosen.map(s => s.name[currentLang] + ' (' + s.price + ' \u20BE)').join(', ') +
+      text: chosen.map(s => s.name[currentLang] + ' (' + s.price + ' $)').join(', ') +
         (rate ? '. ' + T[currentLang].discountLabel + ' ' + Math.round(rate * 100) + '%' : '') +
         '. ' + total + ' $'
     };
