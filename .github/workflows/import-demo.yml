@@ -38,3 +38,4 @@ jobs:
             git commit -m "Import Bucho Denti demo from GALADENT master"
             git push
           fi
+# trigger import
