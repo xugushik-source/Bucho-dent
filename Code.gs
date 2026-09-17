@@ -19,8 +19,8 @@
  * ==========================================================
  */
 
-const SHEET_ID = '1z-CW1n3Csn4wMqdt7-G9cnoMKyhyug8lO4w5Ce4QvZA';       // <-- заменить
-const CALENDAR_ID = 'ВСТАВЬ_СЮДА_BUCHO_DENTI_CALENDAR_ID'; // <-- заменить
+const SHEET_ID = '19dQNsgHeoCtFUH0I3qYp0fm3nO5rEiWwlTN-QIdyVVE'; // Bucho Dent — Bookings (новая, чистая)
+const CALENDAR_ID = '556d248c9a602dc2a3fdec252694b39ca3565e0dbb9e9e30397b0da664bd7e75@group.calendar.google.com'; // Bucho Dent
 
 const WORK_DAYS = [1, 2, 3, 4, 5, 6];  // Пн–Сб (0=Вс, 1=Пн ... 6=Сб) — Вс выходной
 const WORK_START_HOUR = 10;             // 10:00
