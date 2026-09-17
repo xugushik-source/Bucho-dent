@@ -469,6 +469,16 @@
     if (!WEB_APP_URL || WEB_APP_URL.indexOf('ВСТАВЬ_СЮДА') !== -1) {
       return Promise.resolve({ ok: false, error: T[currentLang].notConnected });
     }
+
+    // Slot lookup is read-only: use GET so Google Apps Script can answer
+    // directly through doGet without the slower POST/redirect path.
+    if (action === 'getSlots') {
+      const params = new URLSearchParams({ action: 'getSlots', date: payload.date });
+      return fetch(WEB_APP_URL + '?' + params.toString(), { cache: 'no-store' })
+        .then(r => r.json())
+        .catch(function () { return { ok: false, error: T[currentLang].connErr }; });
+    }
+
     return fetch(WEB_APP_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -484,7 +494,7 @@
     slotsBox.innerHTML = '<div class="empty-note">' + T[currentLang].loading + '</div>';
     apiCall('getSlots', { date: selectedDate }).then(res => {
       if (!res.ok) { slotsBox.innerHTML = '<div class="empty-note">' + (res.error || T[currentLang].loadError) + '</div>'; return; }
-      const slots = res.data;
+      const slots = Array.isArray(res.slots) ? res.slots : (Array.isArray(res.data) ? res.data : []);
       if (!slots.length) {
         slotsBox.innerHTML = '<div class="empty-note">' + T[currentLang].noSlots + '</div>';
         return;
