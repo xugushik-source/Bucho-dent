@@ -153,10 +153,40 @@
   body.lang-ru [data-i18n="ru"]{display:block;}
   body.lang-en [data-i18n="en"]{display:block;}
   body.lang-ka span[data-i18n="ka"], body.lang-ru span[data-i18n="ru"], body.lang-en span[data-i18n="en"]{display:inline;}
+
+  .splash-screen{
+    position:fixed; inset:0; background:var(--bg); z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .5s ease, visibility .5s ease;
+  }
+  .splash-screen.hide{opacity:0; visibility:hidden; pointer-events:none;}
+  .splash-logo{
+    width:150px; height:auto; opacity:0; transform:scale(.85);
+    animation:splashIn .7s ease forwards;
+  }
+  @keyframes splashIn{ to{opacity:1; transform:scale(1);} }
 </style>
 </head>
 <body class="lang-ka">
 <script>(function(){var s=localStorage.getItem('buchoDentiLang'); if(s) document.body.className='lang-'+s;})();</script>
+
+<div id="splashScreen" class="splash-screen" style="display:none;">
+  <img class="splash-logo" src="photos/logo.jpg" alt="BUCHO DENTI">
+</div>
+<script>
+  (function(){
+    if (sessionStorage.getItem('bdSplashShown')) return;
+    sessionStorage.setItem('bdSplashShown', '1');
+    var el = document.getElementById('splashScreen');
+    el.style.display = 'flex';
+    window.addEventListener('load', function(){
+      setTimeout(function(){
+        el.classList.add('hide');
+        setTimeout(function(){ el.remove(); }, 600);
+      }, 900);
+    });
+  })();
+</script>
 
 <div class="topbar">
   <div class="clinic-group">
